@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using RungratDataFeed.Extensions;
 using RungratDataFeed.Models;
 using System;
 using System.IO;
@@ -17,33 +18,37 @@ namespace RungratDataFeed.Functions
         [FunctionName("InsertInvoice")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "invoices")] HttpRequest req,
-			[CosmosDB(databaseName: "rungrat-datafeed-cosmos-db",
-					  collectionName: "Invoices",
+			[CosmosDB(databaseName: Constants.DatabaseId,
+					  collectionName: Constants.InvoiceContainerId,
 					  ConnectionStringSetting = "CosmosDbConnectionString")] IAsyncCollector<Invoice> invoices,
             ILogger log)
         {
-            log.LogInformation("Received a request to insert invoice.");
-
 			try
 			{
-				var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-				var invoice = JsonSerializer.Deserialize<Invoice>(requestBody);
-
-				if (invoice == null)
-					return new BadRequestErrorMessageResult("Invoice is invalid.");
+				var invoice = await CreateInvoice(req);
 
 				await invoices.AddAsync(invoice);
 
-				log.LogInformation($"Invoice:{invoice.InvoiceId} was inserted successfully");
+				log.LogInformation($"Invoice:{invoice.invoiceId} was inserted successfully");
 
 				return new OkResult();
 			}
 			catch (Exception ex)
 			{
-				log.LogCritical(ex, "An error occurred while inserting the invoice.");
+				log.LogCritical(ex, "An error occurred.");
 
 				return new ExceptionResult(ex, includeErrorDetail: true);
 			}
+		}
+
+		private static async Task<Invoice> CreateInvoice(HttpRequest req)
+        {
+			var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+
+			if (requestBody.HasValue()) 
+				return JsonSerializer.Deserialize<Invoice>(requestBody);
+
+			throw new ArgumentNullException(requestBody,"Request body cannot be null or empty.");
 		}
     }
 }

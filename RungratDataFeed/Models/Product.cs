@@ -1,14 +1,19 @@
-﻿namespace RungratDataFeed.Models
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+
+namespace RungratDataFeed.Models
 {
+    [ExcludeFromCodeCoverage]
     public class Product
     {
-        public int ProductId { get; set; }
-        public string Description { get; set; }
-        public string Barcode { get; set; }
-        public string Category { get; set; }
-        public int CategoryId { get; set; }
-        public double UnitPrice { get; set; }
-        public int Quantity { get; set; }
-        public string Note { get; set; }
+        public int productId { get; set; }
+        public string description { get; set; }
+        public string barcode { get; set; }
+        public string category { get; set; }
+        public int categoryId { get; set; }
+        public double unitPrice { get; set; }
+        public int quantity { get; set; }
+        public string note { get; set; }
+		public DateTime dateTime { get; set; }
     }
 }
