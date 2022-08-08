@@ -1,24 +1,24 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RungratDataFeed.Models
 {
     [ExcludeFromCodeCoverage]
+	[JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class Invoice
     {
-        public int invoiceId { get; set; }
-        public int year { get; set; }
-        public int month { get; set; }
-        public int day { get; set; }
-        public string date { get; set; }
-        public DateTime dateTime { get; set; }
-        public Product[] products { get; set; }
-        public Payment[] payments { get; set; }
-        public double invoiceTotal { get; set; }
-        public double generalProductsTotal { get; set; }
-        public double hardwareProductsTotal { get; set; }
-        public double arTotal { get; set; }
-        public double arTotalForGeneralProducts { get; set; }
-        public double arTotalForHardwareProducts { get; set; }
+        public int InvoiceId { get; set; }
+        public string Date { get; set; }
+        public DateTime DateTime { get; set; }
+        public Product[] Products { get; set; }
+        public Payment[] Payments { get; set; }
+        public double InvoiceTotal { get; set; }
+        public double GeneralProductsTotal { get; set; }
+        public double HardwareProductsTotal { get; set; }
+        public double ArTotal { get; set; }
+        public double ArTotalForGeneralProducts { get; set; }
+        public double ArTotalForHardwareProducts { get; set; }
 	}
 }

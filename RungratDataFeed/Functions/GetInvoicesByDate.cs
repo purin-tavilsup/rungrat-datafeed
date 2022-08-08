@@ -10,7 +10,6 @@ using RungratDataFeed.Extensions;
 using RungratDataFeed.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -20,7 +19,7 @@ namespace RungratDataFeed.Functions
     {
         [FunctionName("GetInvoicesByDate")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "invoices")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "datafeed/invoices")] HttpRequest req,
 			[CosmosDB(databaseName: Constants.DatabaseId,
 					  collectionName: Constants.InvoiceContainerId,
 					  ConnectionStringSetting = "CosmosDbConnectionString")] IDocumentClient client,
@@ -53,9 +52,9 @@ namespace RungratDataFeed.Functions
 
 		private static async Task<Invoice[]> GetInvoices(string date, IDocumentClient client)
         {
+			var sqlCommand = $"SELECT * FROM invoices i WHERE i.date = '{date}'";
 			var containerUri = UriFactory.CreateDocumentCollectionUri(Constants.DatabaseId, Constants.InvoiceContainerId);
-			var query = client.CreateDocumentQuery<Invoice>(containerUri)
-							  .Where(invoice => invoice.date == date)
+			var query = client.CreateDocumentQuery<Invoice>(containerUri, sqlCommand)
 							  .AsDocumentQuery();
 
 			var invoices = new List<Invoice>();

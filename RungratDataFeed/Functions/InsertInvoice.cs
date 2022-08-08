@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RungratDataFeed.Extensions;
 using RungratDataFeed.Models;
 using System;
 using System.IO;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web.Http;
 
@@ -17,7 +17,7 @@ namespace RungratDataFeed.Functions
     {
         [FunctionName("InsertInvoice")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "invoices")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "datafeed/invoices")] HttpRequest req,
 			[CosmosDB(databaseName: Constants.DatabaseId,
 					  collectionName: Constants.InvoiceContainerId,
 					  ConnectionStringSetting = "CosmosDbConnectionString")] IAsyncCollector<Invoice> invoices,
@@ -29,7 +29,7 @@ namespace RungratDataFeed.Functions
 
 				await invoices.AddAsync(invoice);
 
-				log.LogInformation($"Invoice:{invoice.invoiceId} was inserted successfully");
+				log.LogInformation($"Invoice:{invoice.InvoiceId} was inserted successfully");
 
 				return new OkResult();
 			}
@@ -46,7 +46,7 @@ namespace RungratDataFeed.Functions
 			var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
 			if (requestBody.HasValue()) 
-				return JsonSerializer.Deserialize<Invoice>(requestBody);
+				return JsonConvert.DeserializeObject<Invoice>(requestBody);
 
 			throw new ArgumentNullException(requestBody,"Request body cannot be null or empty.");
 		}
