@@ -21,7 +21,7 @@ namespace RungratDataFeed.Functions
     {
 		[FunctionName("GetInvoiceProductsByDate")]
 		public static async Task<IActionResult> Run(
-			[HttpTrigger(AuthorizationLevel.Function, "get", Route = "datafeed/invoiceProducts")] HttpRequest req,
+			[HttpTrigger(AuthorizationLevel.Function, "get", Route = "datafeed/invoiceproducts")] HttpRequest req,
 			[CosmosDB(databaseName: Constants.DatabaseId,
 					  collectionName: Constants.InvoiceContainerId,
 					  ConnectionStringSetting = "CosmosDbConnectionString")] IDocumentClient client,

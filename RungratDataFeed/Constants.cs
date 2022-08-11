@@ -5,5 +5,7 @@
         public const string DatabaseId = "rungrat-datafeed-cosmos-db";
 
         public const string InvoiceContainerId = "invoices";
-    }
+
+		public const string SalesReportContainerId = "salesReports";
+	}
 }

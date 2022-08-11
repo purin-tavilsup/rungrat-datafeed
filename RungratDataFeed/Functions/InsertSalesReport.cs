@@ -13,23 +13,23 @@ using System.Web.Http;
 
 namespace RungratDataFeed.Functions
 {
-    public static class InsertInvoice
+    public static class InsertSalesReport
     {
-        [FunctionName("InsertInvoice")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "datafeed/invoices")] HttpRequest req,
+        [FunctionName("InsertSalesReport")]
+		public static async Task<IActionResult> Run(
+			[HttpTrigger(AuthorizationLevel.Function, "post", Route = "datafeed/salesreports")] HttpRequest req,
 			[CosmosDB(databaseName: Constants.DatabaseId,
-					  collectionName: Constants.InvoiceContainerId,
-					  ConnectionStringSetting = "CosmosDbConnectionString")] IAsyncCollector<Invoice> invoices,
+					  collectionName: Constants.SalesReportContainerId,
+					  ConnectionStringSetting = "CosmosDbConnectionString")] IAsyncCollector<SalesReport> reports,
             ILogger log)
         {
 			try
 			{
-				var invoice = await CreateInvoice(req);
+				var report = await CreateReport(req);
 
-				await invoices.AddAsync(invoice);
+				await reports.AddAsync(report);
 
-				log.LogInformation($"Invoice:{invoice.InvoiceId} was inserted successfully");
+				log.LogInformation($"Report:{report.Id} was inserted/updated successfully");
 
 				return new OkResult();
 			}
@@ -39,16 +39,20 @@ namespace RungratDataFeed.Functions
 
 				return new ExceptionResult(ex, includeErrorDetail: true);
 			}
-		}
+        }
 
-		private static async Task<Invoice> CreateInvoice(HttpRequest req)
-        {
+		private static async Task<SalesReport> CreateReport(HttpRequest req)
+		{
 			var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
 			if (!requestBody.HasValue())
 				throw new ArgumentNullException(requestBody, "Request body cannot be null or empty.");
 
-			return JsonConvert.DeserializeObject<Invoice>(requestBody);
+			var report = JsonConvert.DeserializeObject<SalesReport>(requestBody);
+
+			report.Id = $"{DateTime.UtcNow.Year}";
+
+			return report;
 		}
     }
 }
